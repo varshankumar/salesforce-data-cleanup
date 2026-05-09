@@ -11,17 +11,9 @@ import {
   openSalesforceAccount,
   scrapeSalesforceAccount,
 } from "@/lib/agents/salesforce";
-import {
-  cuaApplySalesforceChanges,
-  cuaLoginAndOpenAccount,
-  cuaReadSalesforceSnapshot,
-  startSalesforceCuaSession,
-  stopSalesforceCuaSession,
-} from "@/lib/agents/salesforce-cua";
 import { waitForChallengeResponse } from "@/lib/cleanup/challenge-manager";
 import { saveCleanupRun } from "@/lib/data/store";
 import type {
-  BrowserAction,
   CleanupRun,
   CleanupStepKey,
   CleanupTimelineStep,
@@ -143,16 +135,8 @@ export async function runCleanup(
   let salesforceRecordUrl = process.env.SALESFORCE_ACCOUNT_URL || "";
   let errorMessage: string | undefined;
   let evidence: SourceEvidence[] = [];
-  const browserActions: BrowserAction[] = [];
   const workspace = await launchBrowserWorkspace(runId);
   onSession?.(workspace.session);
-
-  const useCua = process.env.SALESFORCE_USE_CUA === "true";
-  let cuaSession: Awaited<ReturnType<typeof startSalesforceCuaSession>> | null = null;
-
-  const logAction = (action: BrowserAction) => {
-    browserActions.push(action);
-  };
 
   try {
     steps = markStep(steps, "opening-browser", "active", stepDefinitions[0].note);
@@ -167,41 +151,20 @@ export async function runCleanup(
       stepDefinitions[1].note,
     );
     onStep?.(steps);
-    if (useCua) {
-      cuaSession = await startSalesforceCuaSession();
-      await cuaLoginAndOpenAccount(
-        cuaSession,
-        logAction,
-        async (challenge) => {
-          steps = markStep(
-            steps,
-            "signing-into-salesforce",
-            "active",
-            "Waiting for the Salesforce email verification code from the operator.",
-          );
-          onStep?.(steps);
-          onChallenge?.(challenge);
-          return waitForChallengeResponse(runId);
-        },
-        runId,
-      );
-    } else {
-      await loginToSalesforce(workspace.page, {
-        runId,
-        onAction: logAction,
-        onChallenge: async (challenge) => {
-          steps = markStep(
-            steps,
-            "signing-into-salesforce",
-            "active",
-            "Waiting for the Salesforce email verification code from the operator.",
-          );
-          onStep?.(steps);
-          onChallenge?.(challenge);
-          return waitForChallengeResponse(runId);
-        },
-      });
-    }
+    await loginToSalesforce(workspace.page, {
+      runId,
+      onChallenge: async (challenge) => {
+        steps = markStep(
+          steps,
+          "signing-into-salesforce",
+          "active",
+          "Waiting for the Salesforce email verification code from the operator.",
+        );
+        onStep?.(steps);
+        onChallenge?.(challenge);
+        return waitForChallengeResponse(runId);
+      },
+    });
     steps = markStep(steps, "signing-into-salesforce", "completed");
     onStep?.(steps);
 
@@ -212,24 +175,9 @@ export async function runCleanup(
       stepDefinitions[2].note,
     );
     onStep?.(steps);
-    if (useCua && cuaSession) {
-      before = await cuaReadSalesforceSnapshot(cuaSession);
-    } else {
-      salesforceRecordUrl = await openSalesforceAccount(workspace.page);
-      before = await scrapeSalesforceAccount(workspace.page);
-    }
-    if (!before) {
-      throw new Error("Salesforce snapshot was not captured.");
-    }
-    const snapshotSummary = before
-      ? `Found Account Name: ${before.companyName || "Not set"}. Website: ${before.website || "Not set"}. Phone: ${before.phoneNumber || "Not set"}. Billing Address: ${before.billingAddress || "Not set"}.`
-      : "No Salesforce snapshot was captured.";
-    steps = markStep(
-      steps,
-      "reading-salesforce-record",
-      "completed",
-      snapshotSummary,
-    );
+    salesforceRecordUrl = await openSalesforceAccount(workspace.page);
+    before = await scrapeSalesforceAccount(workspace.page);
+    steps = markStep(steps, "reading-salesforce-record", "completed");
     onStep?.(steps);
 
     steps = markStep(
@@ -239,18 +187,12 @@ export async function runCleanup(
       stepDefinitions[3].note,
     );
     onStep?.(steps);
-    const research = await researchCompanyWithBrowser(
-      workspace.context,
-      before,
-      logAction,
-    );
+    const research = await researchCompanyWithBrowser(workspace.context, before);
     summary = research.summary;
     changes = research.changes;
     evidence = research.evidence;
     steps = markStep(steps, "researching-public-web", "completed");
     onStep?.(steps);
-
-    await workspace.page.bringToFront();
 
     steps = markStep(
       steps,
@@ -274,22 +216,16 @@ export async function runCleanup(
       stepDefinitions[5].note,
     );
     onStep?.(steps);
-    await workspace.page.bringToFront();
     const hasProposedChanges = changes.some(
       (change) => change.status === "proposed",
     );
 
     if (hasProposedChanges) {
-      if (useCua && cuaSession) {
-        await cuaApplySalesforceChanges(cuaSession, changes, logAction);
-      } else {
-        changes = await applyChangesToSalesforceBrowser(
-          workspace.page,
-          salesforceRecordUrl,
-          changes,
-          logAction,
-        );
-      }
+      changes = await applyChangesToSalesforceBrowser(
+        workspace.page,
+        salesforceRecordUrl,
+        changes,
+      );
     }
     steps = markStep(
       steps,
@@ -308,12 +244,8 @@ export async function runCleanup(
       stepDefinitions[6].note,
     );
     onStep?.(steps);
-    if (useCua && cuaSession) {
-      after = await cuaReadSalesforceSnapshot(cuaSession);
-    } else {
-      await openSalesforceAccount(workspace.page);
-      after = await scrapeSalesforceAccount(workspace.page);
-    }
+    await openSalesforceAccount(workspace.page);
+    after = await scrapeSalesforceAccount(workspace.page);
     changes = finalizeChanges(changes, after);
     steps = markStep(steps, "verifying-record", "completed");
     onStep?.(steps);
@@ -340,7 +272,6 @@ export async function runCleanup(
       evidence,
       changes,
       session: workspace.session,
-      browserActions,
     };
 
     steps = markStep(steps, "writing-report", "completed");
@@ -372,16 +303,12 @@ export async function runCleanup(
       evidence,
       changes,
       session: workspace.session,
-      browserActions,
       errorMessage,
     };
 
     await saveCleanupRun(failedRun);
     return failedRun;
   } finally {
-    if (cuaSession) {
-      await stopSalesforceCuaSession(cuaSession);
-    }
     await closeBrowserWorkspace(workspace);
   }
 }

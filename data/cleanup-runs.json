@@ -1,5 +1,920 @@
 [
   {
+    "id": "cleanup_9bf71556-11df-4423-8c29-8705217310d2",
+    "status": "failed",
+    "mode": "salesforce-browser-live",
+    "summary": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /^Save$/i })\u001b[22m\n",
+    "createdAt": "2026-05-09T22:56:59.113Z",
+    "completedAt": "2026-05-09T22:56:59.113Z",
+    "salesforceRecordUrl": "https://customer-ruby-8946.lightning.force.com/lightning/r/Account/001ao00002Ej57MAAR/view",
+    "steps": [
+      {
+        "key": "opening-browser",
+        "label": "Opening browser session",
+        "status": "completed",
+        "note": "Launching a Kernel-backed browser session for Salesforce and public-web research.",
+        "timestamp": "2026-05-09T22:54:54.295Z"
+      },
+      {
+        "key": "signing-into-salesforce",
+        "label": "Signing into Salesforce",
+        "status": "completed",
+        "note": "Waiting for the Salesforce email verification code from the operator.",
+        "timestamp": "2026-05-09T22:55:23.553Z"
+      },
+      {
+        "key": "reading-salesforce-record",
+        "label": "Reading Salesforce record",
+        "status": "completed",
+        "note": "Loading the configured Account record and capturing current field values.",
+        "timestamp": "2026-05-09T22:56:05.348Z"
+      },
+      {
+        "key": "researching-public-web",
+        "label": "Researching public web",
+        "status": "completed",
+        "note": "Using the Kernel browser plus Lightcone-reviewed evidence gathering on public company sources.",
+        "timestamp": "2026-05-09T22:56:24.193Z"
+      },
+      {
+        "key": "comparing-evidence",
+        "label": "Comparing evidence",
+        "status": "completed",
+        "note": "1 field updates were proposed.",
+        "timestamp": "2026-05-09T22:56:24.193Z"
+      },
+      {
+        "key": "updating-salesforce",
+        "label": "Updating Salesforce",
+        "status": "error",
+        "note": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /^Save$/i })\u001b[22m\n",
+        "timestamp": "2026-05-09T22:56:59.112Z"
+      },
+      {
+        "key": "verifying-record",
+        "label": "Verifying record",
+        "status": "pending"
+      },
+      {
+        "key": "writing-report",
+        "label": "Writing report",
+        "status": "completed",
+        "timestamp": "2026-05-09T22:56:59.112Z"
+      }
+    ],
+    "before": {
+      "recordUrl": "https://customer-ruby-8946.lightning.force.com/lightning/r/Account/001ao00002Ej57MAAR/view",
+      "companyName": "",
+      "website": "https://www.crayola.com/",
+      "billingAddress": "",
+      "phoneNumber": "",
+      "employeeCount": "2,003",
+      "primaryContactName": "",
+      "primaryContactTitle": "",
+      "primaryContactEmail": "",
+      "capturedAt": "2026-05-09T22:56:05.348Z"
+    },
+    "after": null,
+    "evidence": [
+      {
+        "url": "https://www.crayola.com/",
+        "title": "Home | Products, Coloring Pages, Crafts & More",
+        "extractedText": "Let Your Creativity Travel",
+        "fieldSupported": "companyName",
+        "confidence": 0.84,
+        "notes": "Official-site branding and structured organization metadata were used to validate the Salesforce account name, including suffix changes."
+      },
+      {
+        "url": "https://www.crayola.com/",
+        "title": "Home | Products, Coloring Pages, Crafts & More",
+        "extractedText": "https://www.crayola.com/",
+        "fieldSupported": "website",
+        "confidence": 0.94,
+        "notes": "The current Salesforce website was validated against the highest-confidence official public domain."
+      }
+    ],
+    "changes": [
+      {
+        "field": "companyName",
+        "label": "Company Name",
+        "salesforceLabels": [
+          "Account Name",
+          "Name"
+        ],
+        "oldValue": "",
+        "proposedValue": "Let Your Creativity Travel",
+        "confidence": 0.84,
+        "reasoning": "Official-site branding 'Let Your Creativity Travel' extracted from https://www.crayola.com/ differs from empty Salesforce field. Strong evidence from structured organization metadata confirms this as the correct legal/branding name.",
+        "status": "proposed",
+        "statusNote": "Populating empty field with high-confidence official branding.",
+        "sources": [
+          {
+            "url": "https://www.crayola.com/",
+            "title": "Home | Products, Coloring Pages, Crafts & More",
+            "extractedText": "Let Your Creativity Travel",
+            "fieldSupported": "companyName",
+            "confidence": 0.84,
+            "notes": "Official-site branding and structured organization metadata were used to validate the Salesforce account name, including suffix changes."
+          }
+        ]
+      },
+      {
+        "field": "website",
+        "label": "Website",
+        "salesforceLabels": [
+          "Website"
+        ],
+        "oldValue": "https://www.crayola.com/",
+        "proposedValue": "https://www.crayola.com/",
+        "confidence": 0.94,
+        "reasoning": "Current Salesforce value matches the highest-confidence official public domain found in source evidence.",
+        "status": "unchanged",
+        "statusNote": "No change required; current value is validated and correct.",
+        "sources": [
+          {
+            "url": "https://www.crayola.com/",
+            "title": "Home | Products, Coloring Pages, Crafts & More",
+            "extractedText": "https://www.crayola.com/",
+            "fieldSupported": "website",
+            "confidence": 0.94,
+            "notes": "The current Salesforce website was validated against the highest-confidence official public domain."
+          }
+        ],
+        "finalValue": "https://www.crayola.com/"
+      },
+      {
+        "field": "billingAddress",
+        "label": "Billing Address",
+        "salesforceLabels": [
+          "Billing Address",
+          "Headquarters"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "No public-source recommendation generated for this field.",
+        "status": "skipped",
+        "statusNote": "Insufficient evidence to populate.",
+        "sources": []
+      },
+      {
+        "field": "phoneNumber",
+        "label": "Phone Number",
+        "salesforceLabels": [
+          "Phone"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "No public-source recommendation generated for this field.",
+        "status": "skipped",
+        "statusNote": "Insufficient evidence to populate.",
+        "sources": []
+      },
+      {
+        "field": "employeeCount",
+        "label": "Employee Count",
+        "salesforceLabels": [
+          "Employees",
+          "Employee Count"
+        ],
+        "oldValue": "2,003",
+        "proposedValue": "2,003",
+        "confidence": 0,
+        "reasoning": "No public-source recommendation generated for this field.",
+        "status": "skipped",
+        "statusNote": "Current value retained due to lack of new evidence; conservative decision applied.",
+        "sources": []
+      },
+      {
+        "field": "primaryContactName",
+        "label": "Primary Contact",
+        "salesforceLabels": [
+          "Primary Contact Name",
+          "Primary Contact"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "No public-source recommendation generated for this field.",
+        "status": "skipped",
+        "statusNote": "Insufficient evidence to populate.",
+        "sources": []
+      },
+      {
+        "field": "primaryContactTitle",
+        "label": "Primary Contact Title",
+        "salesforceLabels": [
+          "Primary Contact Title",
+          "Primary Contact Title"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "No public-source recommendation generated for this field.",
+        "status": "skipped",
+        "statusNote": "Insufficient evidence to populate.",
+        "sources": []
+      },
+      {
+        "field": "primaryContactEmail",
+        "label": "Primary Contact Email",
+        "salesforceLabels": [
+          "Primary Contact Email",
+          "Primary Contact Email"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "No public-source recommendation generated for this field.",
+        "status": "skipped",
+        "statusNote": "Insufficient evidence to populate.",
+        "sources": []
+      }
+    ],
+    "session": {
+      "provider": "kernel-cdp",
+      "sessionId": "xxourpevxpsoqktmzqmrejvx",
+      "liveUrl": "https://proxy.iad-elated-ellis.onkernel.com:8443/browser/live/FBhtRW2sXmM8"
+    },
+    "errorMessage": "locator.click: Timeout 30000ms exceeded.\nCall log:\n\u001b[2m  - waiting for getByRole('button', { name: /^Save$/i })\u001b[22m\n"
+  },
+  {
+    "id": "cleanup_a81881c6-e9c1-41c1-bdd3-54ab81703e48",
+    "status": "completed",
+    "mode": "salesforce-browser-live",
+    "summary": "Browser research ran, but it could not establish a trustworthy official website to validate the Salesforce account.",
+    "createdAt": "2026-05-09T22:52:55.270Z",
+    "completedAt": "2026-05-09T22:52:55.270Z",
+    "salesforceRecordUrl": "https://customer-ruby-8946.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Fcustomer-ruby-8946.lightning.force.com%252Flightning%252Fr%252FAccount%252F001ao00002Ej57MAAR%252Fview",
+    "steps": [
+      {
+        "key": "opening-browser",
+        "label": "Opening browser session",
+        "status": "completed",
+        "note": "Launching a Kernel-backed browser session for Salesforce and public-web research.",
+        "timestamp": "2026-05-09T22:52:29.727Z"
+      },
+      {
+        "key": "signing-into-salesforce",
+        "label": "Signing into Salesforce",
+        "status": "completed",
+        "note": "Authenticating with the configured Salesforce developer account.",
+        "timestamp": "2026-05-09T22:52:37.477Z"
+      },
+      {
+        "key": "reading-salesforce-record",
+        "label": "Reading Salesforce record",
+        "status": "completed",
+        "note": "Loading the configured Account record and capturing current field values.",
+        "timestamp": "2026-05-09T22:52:45.018Z"
+      },
+      {
+        "key": "researching-public-web",
+        "label": "Researching public web",
+        "status": "completed",
+        "note": "Using the Kernel browser plus Lightcone-reviewed evidence gathering on public company sources.",
+        "timestamp": "2026-05-09T22:52:47.395Z"
+      },
+      {
+        "key": "comparing-evidence",
+        "label": "Comparing evidence",
+        "status": "completed",
+        "note": "0 field updates were proposed.",
+        "timestamp": "2026-05-09T22:52:47.396Z"
+      },
+      {
+        "key": "updating-salesforce",
+        "label": "Updating Salesforce",
+        "status": "completed",
+        "note": "No changes needed to be written back to Salesforce.",
+        "timestamp": "2026-05-09T22:52:47.396Z"
+      },
+      {
+        "key": "verifying-record",
+        "label": "Verifying record",
+        "status": "completed",
+        "note": "Reloading the Account page to confirm what actually landed in Salesforce.",
+        "timestamp": "2026-05-09T22:52:55.270Z"
+      },
+      {
+        "key": "writing-report",
+        "label": "Writing report",
+        "status": "completed",
+        "note": "Persisting the run timeline, evidence, and final change report.",
+        "timestamp": "2026-05-09T22:52:55.270Z"
+      }
+    ],
+    "before": {
+      "recordUrl": "https://customer-ruby-8946.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Fcustomer-ruby-8946.lightning.force.com%252Flightning%252Fr%252FAccount%252F001ao00002Ej57MAAR%252Fview",
+      "companyName": "Salesforce login",
+      "website": "",
+      "billingAddress": "",
+      "phoneNumber": "",
+      "employeeCount": "",
+      "primaryContactName": "",
+      "primaryContactTitle": "",
+      "primaryContactEmail": "",
+      "capturedAt": "2026-05-09T22:52:45.018Z"
+    },
+    "after": {
+      "recordUrl": "https://customer-ruby-8946.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Fcustomer-ruby-8946.lightning.force.com%252Flightning%252Fr%252FAccount%252F001ao00002Ej57MAAR%252Fview",
+      "companyName": "Salesforce login",
+      "website": "",
+      "billingAddress": "",
+      "phoneNumber": "",
+      "employeeCount": "",
+      "primaryContactName": "",
+      "primaryContactTitle": "",
+      "primaryContactEmail": "",
+      "capturedAt": "2026-05-09T22:52:55.269Z"
+    },
+    "evidence": [],
+    "changes": [
+      {
+        "field": "companyName",
+        "label": "Company Name",
+        "salesforceLabels": [
+          "Account Name",
+          "Name"
+        ],
+        "oldValue": "Salesforce login",
+        "proposedValue": "Salesforce login",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": "Salesforce login"
+      },
+      {
+        "field": "website",
+        "label": "Website",
+        "salesforceLabels": [
+          "Website"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "billingAddress",
+        "label": "Billing Address",
+        "salesforceLabels": [
+          "Billing Address",
+          "Headquarters"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "phoneNumber",
+        "label": "Phone Number",
+        "salesforceLabels": [
+          "Phone"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "employeeCount",
+        "label": "Employee Count",
+        "salesforceLabels": [
+          "Employees",
+          "Employee Count"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactName",
+        "label": "Primary Contact",
+        "salesforceLabels": [
+          "Primary Contact Name",
+          "Primary Contact"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactTitle",
+        "label": "Primary Contact Title",
+        "salesforceLabels": [
+          "Primary Contact Title",
+          "Primary Contact Title"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactEmail",
+        "label": "Primary Contact Email",
+        "salesforceLabels": [
+          "Primary Contact Email",
+          "Primary Contact Email"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      }
+    ],
+    "session": {
+      "provider": "kernel-cdp",
+      "sessionId": "en3wjfmkxdiymew9vd5xqiz8",
+      "liveUrl": "https://proxy.iad-modest-wilson.onkernel.com:8443/browser/live/kwt7ECqF4Iqj"
+    }
+  },
+  {
+    "id": "cleanup_ceb21ac5-ed08-4285-afb8-67439562e8b0",
+    "status": "completed",
+    "mode": "salesforce-browser-live",
+    "summary": "Browser research ran, but it could not establish a trustworthy official website to validate the Salesforce account.",
+    "createdAt": "2026-05-09T22:44:02.745Z",
+    "completedAt": "2026-05-09T22:44:02.745Z",
+    "salesforceRecordUrl": "https://customer-ruby-8946.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Fcustomer-ruby-8946.lightning.force.com%252Flightning%252Fr%252FAccount%252F001ao00002Ej57MAAR%252Fview",
+    "steps": [
+      {
+        "key": "opening-browser",
+        "label": "Opening browser session",
+        "status": "completed",
+        "note": "Launching a Kernel-backed browser session for Salesforce and public-web research.",
+        "timestamp": "2026-05-09T22:43:36.782Z"
+      },
+      {
+        "key": "signing-into-salesforce",
+        "label": "Signing into Salesforce",
+        "status": "completed",
+        "note": "Authenticating with the configured Salesforce developer account.",
+        "timestamp": "2026-05-09T22:43:43.835Z"
+      },
+      {
+        "key": "reading-salesforce-record",
+        "label": "Reading Salesforce record",
+        "status": "completed",
+        "note": "Loading the configured Account record and capturing current field values.",
+        "timestamp": "2026-05-09T22:43:51.614Z"
+      },
+      {
+        "key": "researching-public-web",
+        "label": "Researching public web",
+        "status": "completed",
+        "note": "Using the Kernel browser plus Lightcone-reviewed evidence gathering on public company sources.",
+        "timestamp": "2026-05-09T22:43:54.496Z"
+      },
+      {
+        "key": "comparing-evidence",
+        "label": "Comparing evidence",
+        "status": "completed",
+        "note": "0 field updates were proposed.",
+        "timestamp": "2026-05-09T22:43:54.496Z"
+      },
+      {
+        "key": "updating-salesforce",
+        "label": "Updating Salesforce",
+        "status": "completed",
+        "note": "No changes needed to be written back to Salesforce.",
+        "timestamp": "2026-05-09T22:43:54.496Z"
+      },
+      {
+        "key": "verifying-record",
+        "label": "Verifying record",
+        "status": "completed",
+        "note": "Reloading the Account page to confirm what actually landed in Salesforce.",
+        "timestamp": "2026-05-09T22:44:02.744Z"
+      },
+      {
+        "key": "writing-report",
+        "label": "Writing report",
+        "status": "completed",
+        "note": "Persisting the run timeline, evidence, and final change report.",
+        "timestamp": "2026-05-09T22:44:02.745Z"
+      }
+    ],
+    "before": {
+      "recordUrl": "https://customer-ruby-8946.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Fcustomer-ruby-8946.lightning.force.com%252Flightning%252Fr%252FAccount%252F001ao00002Ej57MAAR%252Fview",
+      "companyName": "Salesforce login",
+      "website": "",
+      "billingAddress": "",
+      "phoneNumber": "",
+      "employeeCount": "",
+      "primaryContactName": "",
+      "primaryContactTitle": "",
+      "primaryContactEmail": "",
+      "capturedAt": "2026-05-09T22:43:51.614Z"
+    },
+    "after": {
+      "recordUrl": "https://customer-ruby-8946.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Fcustomer-ruby-8946.lightning.force.com%252Flightning%252Fr%252FAccount%252F001ao00002Ej57MAAR%252Fview",
+      "companyName": "Salesforce login",
+      "website": "",
+      "billingAddress": "",
+      "phoneNumber": "",
+      "employeeCount": "",
+      "primaryContactName": "",
+      "primaryContactTitle": "",
+      "primaryContactEmail": "",
+      "capturedAt": "2026-05-09T22:44:02.744Z"
+    },
+    "evidence": [],
+    "changes": [
+      {
+        "field": "companyName",
+        "label": "Company Name",
+        "salesforceLabels": [
+          "Account Name",
+          "Name"
+        ],
+        "oldValue": "Salesforce login",
+        "proposedValue": "Salesforce login",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": "Salesforce login"
+      },
+      {
+        "field": "website",
+        "label": "Website",
+        "salesforceLabels": [
+          "Website"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "billingAddress",
+        "label": "Billing Address",
+        "salesforceLabels": [
+          "Billing Address",
+          "Headquarters"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "phoneNumber",
+        "label": "Phone Number",
+        "salesforceLabels": [
+          "Phone"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "employeeCount",
+        "label": "Employee Count",
+        "salesforceLabels": [
+          "Employees",
+          "Employee Count"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactName",
+        "label": "Primary Contact",
+        "salesforceLabels": [
+          "Primary Contact Name",
+          "Primary Contact"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactTitle",
+        "label": "Primary Contact Title",
+        "salesforceLabels": [
+          "Primary Contact Title",
+          "Primary Contact Title"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactEmail",
+        "label": "Primary Contact Email",
+        "salesforceLabels": [
+          "Primary Contact Email",
+          "Primary Contact Email"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      }
+    ],
+    "session": {
+      "provider": "kernel-cdp",
+      "sessionId": "rgx6u0z0cko0sunw2f6ti10h",
+      "liveUrl": "https://proxy.yul-funny-austin.onkernel.com:8443/browser/live/BjT7US8GKPyf"
+    }
+  },
+  {
+    "id": "cleanup_97e81a07-d04a-43f4-866d-dd6bfa660cc3",
+    "status": "completed",
+    "mode": "salesforce-browser-live",
+    "summary": "Browser research ran, but it could not establish a trustworthy official website to validate the Salesforce account.",
+    "createdAt": "2026-05-09T22:41:13.262Z",
+    "completedAt": "2026-05-09T22:41:13.262Z",
+    "salesforceRecordUrl": "https://customer-ruby-8946.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Fcustomer-ruby-8946.lightning.force.com%252Flightning%252Fr%252FAccount%252F001ao00002Ej57MAAR%252Fview",
+    "steps": [
+      {
+        "key": "opening-browser",
+        "label": "Opening browser session",
+        "status": "completed",
+        "note": "Launching a Kernel-backed browser session for Salesforce and public-web research.",
+        "timestamp": "2026-05-09T22:39:43.268Z"
+      },
+      {
+        "key": "signing-into-salesforce",
+        "label": "Signing into Salesforce",
+        "status": "completed",
+        "note": "Authenticating with the configured Salesforce developer account.",
+        "timestamp": "2026-05-09T22:40:53.804Z"
+      },
+      {
+        "key": "reading-salesforce-record",
+        "label": "Reading Salesforce record",
+        "status": "completed",
+        "note": "Loading the configured Account record and capturing current field values.",
+        "timestamp": "2026-05-09T22:41:03.073Z"
+      },
+      {
+        "key": "researching-public-web",
+        "label": "Researching public web",
+        "status": "completed",
+        "note": "Using the Kernel browser plus Lightcone-reviewed evidence gathering on public company sources.",
+        "timestamp": "2026-05-09T22:41:06.134Z"
+      },
+      {
+        "key": "comparing-evidence",
+        "label": "Comparing evidence",
+        "status": "completed",
+        "note": "0 field updates were proposed.",
+        "timestamp": "2026-05-09T22:41:06.135Z"
+      },
+      {
+        "key": "updating-salesforce",
+        "label": "Updating Salesforce",
+        "status": "completed",
+        "note": "No changes needed to be written back to Salesforce.",
+        "timestamp": "2026-05-09T22:41:06.135Z"
+      },
+      {
+        "key": "verifying-record",
+        "label": "Verifying record",
+        "status": "completed",
+        "note": "Reloading the Account page to confirm what actually landed in Salesforce.",
+        "timestamp": "2026-05-09T22:41:13.262Z"
+      },
+      {
+        "key": "writing-report",
+        "label": "Writing report",
+        "status": "completed",
+        "note": "Persisting the run timeline, evidence, and final change report.",
+        "timestamp": "2026-05-09T22:41:13.262Z"
+      }
+    ],
+    "before": {
+      "recordUrl": "https://customer-ruby-8946.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Fcustomer-ruby-8946.lightning.force.com%252Flightning%252Fr%252FAccount%252F001ao00002Ej57MAAR%252Fview",
+      "companyName": "Salesforce login",
+      "website": "",
+      "billingAddress": "",
+      "phoneNumber": "",
+      "employeeCount": "",
+      "primaryContactName": "",
+      "primaryContactTitle": "",
+      "primaryContactEmail": "",
+      "capturedAt": "2026-05-09T22:41:03.073Z"
+    },
+    "after": {
+      "recordUrl": "https://customer-ruby-8946.my.salesforce.com/?ec=302&startURL=%2Fvisualforce%2Fsession%3Furl%3Dhttps%253A%252F%252Fcustomer-ruby-8946.lightning.force.com%252Flightning%252Fr%252FAccount%252F001ao00002Ej57MAAR%252Fview",
+      "companyName": "Salesforce login",
+      "website": "",
+      "billingAddress": "",
+      "phoneNumber": "",
+      "employeeCount": "",
+      "primaryContactName": "",
+      "primaryContactTitle": "",
+      "primaryContactEmail": "",
+      "capturedAt": "2026-05-09T22:41:13.262Z"
+    },
+    "evidence": [],
+    "changes": [
+      {
+        "field": "companyName",
+        "label": "Company Name",
+        "salesforceLabels": [
+          "Account Name",
+          "Name"
+        ],
+        "oldValue": "Salesforce login",
+        "proposedValue": "Salesforce login",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": "Salesforce login"
+      },
+      {
+        "field": "website",
+        "label": "Website",
+        "salesforceLabels": [
+          "Website"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "billingAddress",
+        "label": "Billing Address",
+        "salesforceLabels": [
+          "Billing Address",
+          "Headquarters"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "phoneNumber",
+        "label": "Phone Number",
+        "salesforceLabels": [
+          "Phone"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "employeeCount",
+        "label": "Employee Count",
+        "salesforceLabels": [
+          "Employees",
+          "Employee Count"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactName",
+        "label": "Primary Contact",
+        "salesforceLabels": [
+          "Primary Contact Name",
+          "Primary Contact"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactTitle",
+        "label": "Primary Contact Title",
+        "salesforceLabels": [
+          "Primary Contact Title",
+          "Primary Contact Title"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactEmail",
+        "label": "Primary Contact Email",
+        "salesforceLabels": [
+          "Primary Contact Email",
+          "Primary Contact Email"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0.2,
+        "reasoning": "The browser session could not identify an official public web source with enough confidence to compare against Salesforce.",
+        "status": "skipped",
+        "statusNote": "Search results did not produce a trustworthy official company website to validate against.",
+        "sources": [],
+        "finalValue": ""
+      }
+    ],
+    "session": {
+      "provider": "kernel-cdp",
+      "sessionId": "bf8xcl7wfhenko9ruuvpz3pj",
+      "liveUrl": "https://proxy.iad-suspicious-banzai.onkernel.com:8443/browser/live/PbRzKDCDc3sN"
+    }
+  },
+  {
     "id": "cleanup_70c28020-69f5-4e1a-b0c4-8b04c363e25c",
     "status": "failed",
     "mode": "salesforce-browser-live",

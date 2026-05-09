@@ -7,11 +7,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 
-import { ChangesReport } from "@/components/cleanup/changes-report";
 import { CleanupTimeline } from "@/components/cleanup/cleanup-timeline";
-import { BrowserActionReport } from "@/components/cleanup/browser-action-report";
-import { EvidenceGrid } from "@/components/cleanup/evidence-grid";
-import { SnapshotPanel } from "@/components/cleanup/snapshot-panel";
 import { getCleanupRunById } from "@/lib/data/store";
 import { formatDateTime } from "@/lib/utils";
 
@@ -85,14 +81,6 @@ export default async function CleanupRunPage({
           ) : null}
         </div>
 
-        <div className="grid gap-8 xl:grid-cols-2">
-          <SnapshotPanel title="Before cleanup" snapshot={run.before} />
-          <SnapshotPanel title="After cleanup" snapshot={run.after} />
-        </div>
-
-        <ChangesReport changes={run.changes} />
-        <EvidenceGrid evidence={run.evidence} />
-        <BrowserActionReport actions={run.browserActions || []} />
         <CleanupTimeline
           steps={run.steps}
           title="Cleanup execution timeline"
@@ -128,12 +116,23 @@ export default async function CleanupRunPage({
               <div className="text-xs uppercase tracking-[0.22em] text-slate-500">
                 Browser artifact
               </div>
-              <div className="mt-2 text-sm text-white">
-                {run.session.replayUrl ||
-                  run.session.liveUrl ||
-                  run.session.tracePath ||
-                  "No browser artifact recorded"}
-              </div>
+              {run.session.liveUrl ? (
+                <a
+                  href={run.session.liveUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="mt-2 inline-flex items-center gap-2 text-sm text-cyan-100 hover:text-cyan-50"
+                >
+                  View live browser
+                  <ArrowUpRight className="h-4 w-4" />
+                </a>
+              ) : (
+                <div className="mt-2 text-sm text-white">
+                  {run.session.replayUrl ||
+                    run.session.tracePath ||
+                    "No browser artifact recorded"}
+                </div>
+              )}
             </div>
           </div>
 

@@ -2,8 +2,6 @@ import type { BrowserContext, Page } from "playwright";
 
 import type {
   BrowserResearchResult,
-  BrowserAction,
-  CleanupField,
   FieldChange,
   SalesforceAccountSnapshot,
   SourceEvidence,
@@ -69,20 +67,18 @@ interface SiteCandidate {
 }
 
 const blockedWebsiteDomains = new Set([
+  "bing.com",
+  "duckduckgo.com",
+  "search.brave.com",
+  "linkedin.com",
   "facebook.com",
   "instagram.com",
   "x.com",
   "twitter.com",
   "wikipedia.org",
   "crunchbase.com",
-]);
-
-const referenceDomains = new Set([
-  "linkedin.com",
   "zoominfo.com",
-  "clearbit.com",
-  "apollo.io",
-  "leadiq.com",
+  "bloomberg.com",
 ]);
 
 function makeEvidence(
@@ -149,24 +145,8 @@ function isLikelyOfficialWebsiteCandidate(url: string) {
     return false;
   }
 
-  if (referenceDomains.has(domain) || Array.from(referenceDomains).some((ref) => domain.endsWith(`.${ref}`))) {
-    return false;
-  }
-
   return !Array.from(blockedWebsiteDomains).some(
     (blocked) => domain === blocked || domain.endsWith(`.${blocked}`),
-  );
-}
-
-function isReferenceDomain(url: string) {
-  const domain = domainFromUrl(url);
-  if (!domain) {
-    return false;
-  }
-
-  return (
-    referenceDomains.has(domain) ||
-    Array.from(referenceDomains).some((ref) => domain.endsWith(`.${ref}`))
   );
 }
 
@@ -182,26 +162,6 @@ function companyNameMatches(companyNeedle: string, candidate: string) {
   );
 }
 
-async function safeEvaluateAll<T, A>(
-  page: Page,
-  locator: ReturnType<Page["locator"]>,
-  mapper: (nodes: Element[], arg: A) => T,
-  arg: A,
-): Promise<T> {
-  try {
-    return await locator.evaluateAll(mapper, arg);
-  } catch (error) {
-    const message = error instanceof Error ? error.message : String(error || "");
-    if (!message.includes("Execution context was destroyed")) {
-      throw error;
-    }
-
-    await page.waitForLoadState("domcontentloaded");
-    await page.waitForTimeout(400);
-    return locator.evaluateAll(mapper, arg);
-  }
-}
-
 async function searchDuckDuckGo(page: Page, query: string): Promise<SearchHit[]> {
   const url = `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
   try {
@@ -211,9 +171,7 @@ async function searchDuckDuckGo(page: Page, query: string): Promise<SearchHit[]>
     return [];
   }
 
-  return safeEvaluateAll(
-    page,
-    page.locator(".result"),
+  return page.locator(".result").evaluateAll(
     (nodes, currentQuery) =>
       nodes
         .slice(0, 6)
@@ -242,9 +200,7 @@ async function searchBing(page: Page, query: string): Promise<SearchHit[]> {
     return [];
   }
 
-  return safeEvaluateAll(
-    page,
-    page.locator("li.b_algo"),
+  return page.locator("li.b_algo").evaluateAll(
     (nodes, currentQuery) =>
       nodes
         .slice(0, 6)
@@ -273,9 +229,7 @@ async function searchBrave(page: Page, query: string): Promise<SearchHit[]> {
     return [];
   }
 
-  return safeEvaluateAll(
-    page,
-    page.locator(".snippet"),
+  return page.locator(".snippet").evaluateAll(
     (nodes, currentQuery) =>
       nodes
         .slice(0, 6)
@@ -298,36 +252,19 @@ async function searchBrave(page: Page, query: string): Promise<SearchHit[]> {
 
 async function searchWeb(page: Page, query: string) {
   const searchFns = [searchDuckDuckGo, searchBing, searchBrave];
-  const allResults: SearchHit[] = [];
 
   for (const searchFn of searchFns) {
     const results = await searchFn(page, query);
-    allResults.push(...results);
+    if (results.length > 0) {
+      return results;
+    }
   }
 
-  const seen = new Set<string>();
-  return allResults.filter((result) => {
-    const normalized = normalizeUrlOrigin(result.url);
-    if (!normalized || seen.has(normalized)) {
-      return false;
-    }
-    seen.add(normalized);
-    return true;
-  });
+  return [];
 }
 
-async function extractPageSignals(
-  page: Page,
-  url: string,
-  onAction?: (action: BrowserAction) => void,
-): Promise<PageSignals> {
+async function extractPageSignals(page: Page, url: string): Promise<PageSignals> {
   try {
-    onAction?.({
-      timestamp: new Date().toISOString(),
-      scope: "research",
-      action: "navigate",
-      url,
-    });
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 20000 });
     await page.waitForTimeout(1200);
   } catch {
@@ -714,14 +651,9 @@ function createChange(
   confidence: number,
   reasoning: string,
   sources: SourceEvidence[],
-  minSources = 0,
 ) {
   const metadata = getSalesforceFieldMetadata().find((item) => item.field === field);
   const oldValue = normalizeSalesforceValue(snapshot[field]);
-
-  const distinctSourceCount = new Set(
-    sources.map((source) => normalizeUrlOrigin(source.url)).filter(Boolean),
-  ).size;
 
   if (!metadata) {
     throw new Error(`Missing field metadata for ${field}`);
@@ -745,21 +677,6 @@ function createChange(
       reasoning,
       status: "skipped" as const,
       statusNote: "No reliable public evidence was strong enough to support an update.",
-      sources,
-    };
-  }
-
-  if (minSources > 0 && distinctSourceCount < minSources) {
-    return {
-      field,
-      label: metadata.label,
-      salesforceLabels: metadata.salesforceLabels,
-      oldValue,
-      proposedValue: normalizedProposed,
-      confidence: Math.max(0.1, confidence - 0.2),
-      reasoning,
-      status: "skipped" as const,
-      statusNote: `Only ${distinctSourceCount} source${distinctSourceCount === 1 ? "" : "s"} corroborated this field; at least ${minSources} are required for writeback.`,
       sources,
     };
   }
@@ -794,42 +711,6 @@ function createChange(
   };
 }
 
-function enforceSequentialValidation(
-  changes: FieldChange[],
-  order: CleanupField[],
-) {
-  const nextChanges = changes.map((change) => ({ ...change }));
-  let blockRemaining = false;
-
-  for (const field of order) {
-    const change = nextChanges.find((item) => item.field === field);
-    if (!change) {
-      continue;
-    }
-
-    if (blockRemaining) {
-      change.status = "skipped";
-      change.statusNote =
-        "Prior fields were not fully validated; this field was not evaluated.";
-      continue;
-    }
-
-    if (change.status === "skipped") {
-      blockRemaining = true;
-    }
-  }
-
-  return nextChanges;
-}
-
-function mapSignalsByOrigin(signals: PageSignals[]) {
-  return new Map(
-    signals
-      .map((signal) => [normalizeUrlOrigin(signal.canonicalUrl || signal.finalUrl), signal] as const)
-      .filter(([origin]) => origin),
-  );
-}
-
 function buildCompanySearchSeed(snapshot: SalesforceAccountSnapshot) {
   const candidates = [
     normalizeSalesforceValue(snapshot.companyName),
@@ -844,7 +725,6 @@ async function selectOfficialSiteCandidate(
   snapshot: SalesforceAccountSnapshot,
   companySearchSeed: string,
   hits: SearchHit[],
-  onAction?: (action: BrowserAction) => void,
 ) {
   const candidateUrls = dedupeStrings(
     [
@@ -858,7 +738,7 @@ async function selectOfficialSiteCandidate(
   const scoredCandidates: SiteCandidate[] = [];
 
   for (const candidateUrl of candidateUrls) {
-    const signals = await extractPageSignals(page, candidateUrl, onAction);
+    const signals = await extractPageSignals(page, candidateUrl);
     const score = scoreOfficialSiteCandidate(
       snapshot,
       companySearchSeed,
@@ -886,16 +766,9 @@ async function selectOfficialSiteCandidate(
 export async function researchCompanyWithBrowser(
   context: BrowserContext,
   snapshot: SalesforceAccountSnapshot,
-  onAction?: (action: BrowserAction) => void,
 ): Promise<BrowserResearchResult> {
   const page = await context.newPage();
-  await page.bringToFront();
-  onAction?.({
-    timestamp: new Date().toISOString(),
-    scope: "research",
-    action: "open-tab",
-  });
-  let changes = buildNoChangeEntries(snapshot);
+  const changes = buildNoChangeEntries(snapshot);
   const evidence: SourceEvidence[] = [];
   const consultedUrls = new Set<string>();
   const companySearchSeed = buildCompanySearchSeed(snapshot);
@@ -930,24 +803,12 @@ export async function researchCompanyWithBrowser(
   const searchQueries = companySearchSeed
     ? [
         `${companySearchSeed} official website`,
-        `${companySearchSeed} contact`,
-        `${companySearchSeed} about`,
-        `${companySearchSeed} headquarters address`,
-        `${companySearchSeed} phone number`,
         `${companySearchSeed} billing address`,
+        `${companySearchSeed} phone number`,
         `${companySearchSeed} employee count`,
         `${companySearchSeed} leadership`,
       ]
     : [];
-
-  searchQueries.forEach((query) => {
-    onAction?.({
-      timestamp: new Date().toISOString(),
-      scope: "research",
-      action: "search",
-      details: query,
-    });
-  });
 
   const queryResults =
     searchQueries.length > 0
@@ -959,21 +820,12 @@ export async function researchCompanyWithBrowser(
         )
       : [];
 
-  const dedupedHits = new Map<string, SearchHit>();
-  for (const hit of queryResults.flatMap((entry) => entry.hits)) {
-    const normalized = normalizeUrlOrigin(hit.url);
-    if (!normalized || dedupedHits.has(normalized)) {
-      continue;
-    }
-    dedupedHits.set(normalized, hit);
-  }
-  const allHits = Array.from(dedupedHits.values()).slice(0, 18);
+  const allHits = queryResults.flatMap((entry) => entry.hits);
   const selectedSite = await selectOfficialSiteCandidate(
     page,
     snapshot,
     companySearchSeed,
     allHits,
-    onAction,
   );
 
   if (!selectedSite) {
@@ -1012,7 +864,7 @@ export async function researchCompanyWithBrowser(
     ]
       .map((url) => toAbsoluteUrl(url))
       .filter((url) => domainFromUrl(url) === officialDomain),
-  ).slice(0, 6);
+  ).slice(0, 4);
 
   const secondarySignals: PageSignals[] = [];
   for (const link of sameDomainSearchLinks) {
@@ -1021,30 +873,12 @@ export async function researchCompanyWithBrowser(
     }
 
     consultedUrls.add(link);
-    secondarySignals.push(await extractPageSignals(page, link, onAction));
-  }
-
-  const corroborationLinks = dedupeStrings(
-    allHits
-      .map((hit) => normalizeUrlOrigin(hit.url))
-      .filter((url) =>
-        url &&
-        domainFromUrl(url) !== officialDomain &&
-        !isLikelySalesforceHost(url) &&
-        (isLikelyOfficialWebsiteCandidate(url) || isReferenceDomain(url)),
-      ),
-  ).slice(0, 3);
-
-  const corroborationSignals: PageSignals[] = [];
-  for (const link of corroborationLinks) {
-    consultedUrls.add(link);
-    corroborationSignals.push(await extractPageSignals(page, link, onAction));
+    secondarySignals.push(await extractPageSignals(page, link));
   }
 
   const allOrganizations = [
     ...officialSignals.organizations,
     ...secondarySignals.flatMap((signal) => signal.organizations),
-    ...corroborationSignals.flatMap((signal) => signal.organizations),
   ];
   const searchSnippets = allHits
     .map((hit) => normalizeSalesforceValue(hit.snippet))
@@ -1052,16 +886,8 @@ export async function researchCompanyWithBrowser(
   const allTexts = [
     officialSignals.bodyText,
     ...secondarySignals.map((signal) => signal.bodyText),
-    ...corroborationSignals.map((signal) => signal.bodyText),
     ...searchSnippets,
   ].filter(Boolean);
-
-  const signalPool = [
-    officialSignals,
-    ...secondarySignals,
-    ...corroborationSignals,
-  ];
-  const signalByOrigin = mapSignalsByOrigin(signalPool);
 
   const companyNameCandidate = extractCompanyNameFromSite(snapshot, officialSignals);
   const websiteCandidate = firstNonEmpty([
@@ -1087,29 +913,20 @@ export async function researchCompanyWithBrowser(
     ...secondarySignals.map((signal) => signal.mailto),
   ]);
 
-  const companyEvidenceSources = signalPool
-    .map((signal) => {
-      const url = normalizeUrlOrigin(signal.canonicalUrl || signal.finalUrl);
-      const value = extractCompanyNameFromSite(snapshot, signal);
-      if (!url || !value) {
-        return null;
-      }
-      return { url, value, title: signal.title || "Public source" };
-    })
-    .filter((item): item is { url: string; value: string; title: string } => Boolean(item));
-
-  const companyEvidenceList = companyEvidenceSources.slice(0, 3).map((item) =>
-    makeEvidence(
-      "companyName",
-      item.url,
-      item.title,
-      item.value,
-      0.8,
-      "Company name was validated against multiple public sources.",
-    ),
+  const companyEvidence = makeEvidence(
+    "companyName",
+    officialUrl,
+    officialSignals.title || "Official website",
+    firstNonEmpty([
+      allOrganizations.find((organization) => organization.name)?.name,
+      officialSignals.h1,
+      officialSignals.title,
+      snapshot.companyName,
+    ]),
+    0.84,
+    "Official-site branding and structured organization metadata were used to validate the Salesforce account name, including suffix changes.",
   );
-
-  evidence.push(...companyEvidenceList);
+  evidence.push(companyEvidence);
   changes.splice(
     0,
     changes.length,
@@ -1120,33 +937,23 @@ export async function researchCompanyWithBrowser(
         "companyName",
         companyNameCandidate,
         0.84,
-        "Official-site branding and corroborating sources were compared against the Salesforce account name to detect renames and suffix mismatches.",
-        companyEvidenceList,
-        2,
+        "Official-site branding was compared against the Salesforce account name to detect renames and suffix mismatches.",
+        [companyEvidence],
       ),
     ),
   );
 
-  const websiteEvidenceList = dedupeStrings(
-    [
-      officialUrl,
-      ...sameDomainSearchLinks.map((link) => normalizeUrlOrigin(link)),
-    ].filter(Boolean),
-  )
-    .map((url) => {
-      const signal = signalByOrigin.get(url);
-      return makeEvidence(
-        "website",
-        url,
-        signal?.title || "Official website",
-        normalizeUrlOrigin(websiteCandidate),
-        0.9,
-        "Official site domain was corroborated across multiple company pages.",
-      );
-    })
-    .slice(0, 3);
-
-  evidence.push(...websiteEvidenceList);
+  const websiteEvidence = makeEvidence(
+    "website",
+    officialUrl,
+    officialSignals.title || "Official website",
+    normalizeUrlOrigin(websiteCandidate),
+    0.94,
+    normalizeSalesforceValue(snapshot.website)
+      ? "The current Salesforce website was validated against the highest-confidence official public domain."
+      : "The official public website was identified from search results and validated directly in the browser.",
+  );
+  evidence.push(websiteEvidence);
   changes.splice(
     0,
     changes.length,
@@ -1157,89 +964,22 @@ export async function researchCompanyWithBrowser(
         "website",
         websiteCandidate,
         0.94,
-        "The official public web domain was corroborated across multiple sources instead of assuming the current Salesforce Website field was correct.",
-        websiteEvidenceList,
-        2,
+        "The official public web domain was checked directly instead of assuming the current Salesforce Website field was correct.",
+        [websiteEvidence],
       ),
     ),
   );
 
-  if (phoneCandidate) {
-    const normalizedPhoneCandidate = normalizePhoneNumber(phoneCandidate);
-    const phoneEvidenceList = signalPool
-      .map((signal) => {
-        const url = normalizeUrlOrigin(signal.canonicalUrl || signal.finalUrl);
-        const value = extractPhoneFromOrganizations(
-          signal.organizations,
-          [signal.bodyText],
-        );
-        if (!url || !value) {
-          return null;
-        }
-        if (normalizePhoneNumber(value) !== normalizedPhoneCandidate) {
-          return null;
-        }
-        return makeEvidence(
-          "phoneNumber",
-          url,
-          signal.title || "Public contact signal",
-          value,
-          0.82,
-          "Phone number corroborated across multiple sources.",
-        );
-      })
-      .filter((item): item is SourceEvidence => Boolean(item))
-      .slice(0, 3);
-
-    evidence.push(...phoneEvidenceList);
-    changes.splice(
-      0,
-      changes.length,
-      ...replaceChange(
-        changes,
-        createChange(
-          snapshot,
-          "phoneNumber",
-          phoneCandidate,
-          0.82,
-          "Official public contact information was corroborated across multiple sources.",
-          phoneEvidenceList,
-          2,
-        ),
-      ),
-    );
-  }
-
   if (billingAddressCandidate) {
-    const normalizedAddressCandidate = normalizeSalesforceValue(
+    const billingEvidence = makeEvidence(
+      "billingAddress",
+      officialUrl,
+      "Official address signal",
       billingAddressCandidate,
+      0.78,
+      "Structured organization metadata and official contact pages were used to populate the Salesforce Billing Address field.",
     );
-    const billingEvidenceList = signalPool
-      .map((signal) => {
-        const url = normalizeUrlOrigin(signal.canonicalUrl || signal.finalUrl);
-        const value = extractAddressFromOrganizations(
-          signal.organizations,
-          [signal.bodyText],
-        );
-        if (!url || !value) {
-          return null;
-        }
-        if (normalizeSalesforceValue(value) !== normalizedAddressCandidate) {
-          return null;
-        }
-        return makeEvidence(
-          "billingAddress",
-          url,
-          signal.title || "Public address signal",
-          value,
-          0.78,
-          "Address corroborated across multiple sources.",
-        );
-      })
-      .filter((item): item is SourceEvidence => Boolean(item))
-      .slice(0, 3);
-
-    evidence.push(...billingEvidenceList);
+    evidence.push(billingEvidence);
     changes.splice(
       0,
       changes.length,
@@ -1250,9 +990,35 @@ export async function researchCompanyWithBrowser(
           "billingAddress",
           billingAddressCandidate,
           0.78,
-          "Official public address signals were corroborated across multiple sources.",
-          billingEvidenceList,
-          2,
+          "Official public address signals were compared against the Salesforce Billing Address field.",
+          [billingEvidence],
+        ),
+      ),
+    );
+  }
+
+  if (phoneCandidate) {
+    const phoneEvidence = makeEvidence(
+      "phoneNumber",
+      officialUrl,
+      "Official contact signal",
+      phoneCandidate,
+      0.82,
+      "Phone number came from official-site structured data, contact links, or visible contact copy.",
+    );
+    evidence.push(phoneEvidence);
+    changes.splice(
+      0,
+      changes.length,
+      ...replaceChange(
+        changes,
+        createChange(
+          snapshot,
+          "phoneNumber",
+          phoneCandidate,
+          0.82,
+          "Official public contact information was compared against the Salesforce Phone field.",
+          [phoneEvidence],
         ),
       ),
     );
@@ -1369,25 +1135,13 @@ export async function researchCompanyWithBrowser(
       return {
         summary: reviewed.summary,
         evidence,
-        changes: enforceSequentialValidation(reviewed.changes, [
-          "companyName",
-          "website",
-          "billingAddress",
-          "phoneNumber",
-        ]),
+        changes: reviewed.changes,
         consultedUrls: Array.from(consultedUrls),
       };
     } catch {
       // Fall back to deterministic browser-derived changes if model review fails.
     }
   }
-
-  changes = enforceSequentialValidation(changes, [
-    "companyName",
-    "website",
-    "billingAddress",
-    "phoneNumber",
-  ]);
 
   return {
     summary:
