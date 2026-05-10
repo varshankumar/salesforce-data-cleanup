@@ -1,5 +1,311 @@
 [
   {
+    "id": "cleanup_5af53f7d-57fa-4f37-93fe-2ab53d1adb7a",
+    "status": "completed",
+    "mode": "salesforce-browser-live",
+    "summary": "Cleanup skipped public research because the Salesforce snapshot did not expose a reliable company name or website seed.",
+    "createdAt": "2026-05-09T23:05:26.202Z",
+    "completedAt": "2026-05-09T23:05:26.202Z",
+    "salesforceRecordUrl": "https://customer-ruby-8946.lightning.force.com/lightning/r/Account/001ao00002Ej57MAAR/view",
+    "steps": [
+      {
+        "key": "opening-browser",
+        "label": "Opening browser session",
+        "status": "completed",
+        "note": "Launching a Kernel-backed browser session for Salesforce and public-web research.",
+        "timestamp": "2026-05-09T23:04:04.319Z"
+      },
+      {
+        "key": "signing-into-salesforce",
+        "label": "Signing into Salesforce",
+        "status": "completed",
+        "note": "Waiting for the Salesforce email verification code from the operator.",
+        "timestamp": "2026-05-09T23:04:51.569Z"
+      },
+      {
+        "key": "reading-salesforce-record",
+        "label": "Reading Salesforce record",
+        "status": "completed",
+        "note": "Loading the configured Account record and capturing current field values.",
+        "timestamp": "2026-05-09T23:05:08.894Z"
+      },
+      {
+        "key": "researching-public-web",
+        "label": "Researching public web",
+        "status": "completed",
+        "note": "Using the Kernel browser plus Lightcone-reviewed evidence gathering on public company sources.",
+        "timestamp": "2026-05-09T23:05:09.203Z"
+      },
+      {
+        "key": "comparing-evidence",
+        "label": "Comparing evidence",
+        "status": "completed",
+        "note": "0 field updates were proposed.",
+        "timestamp": "2026-05-09T23:05:09.203Z"
+      },
+      {
+        "key": "updating-salesforce",
+        "label": "Updating Salesforce",
+        "status": "completed",
+        "note": "No changes needed to be written back to Salesforce.",
+        "timestamp": "2026-05-09T23:05:09.203Z"
+      },
+      {
+        "key": "verifying-record",
+        "label": "Verifying record",
+        "status": "completed",
+        "note": "Reloading the Account page to confirm what actually landed in Salesforce.",
+        "timestamp": "2026-05-09T23:05:26.202Z"
+      },
+      {
+        "key": "writing-report",
+        "label": "Writing report",
+        "status": "completed",
+        "note": "Persisting the run timeline, evidence, and final change report.",
+        "timestamp": "2026-05-09T23:05:26.202Z"
+      }
+    ],
+    "before": {
+      "recordUrl": "https://customer-ruby-8946.lightning.force.com/lightning/r/Account/001ao00002Ej57MAAR/view",
+      "companyName": "",
+      "website": "",
+      "billingAddress": "",
+      "phoneNumber": "",
+      "employeeCount": "",
+      "primaryContactName": "",
+      "primaryContactTitle": "",
+      "primaryContactEmail": "",
+      "capturedAt": "2026-05-09T23:05:08.894Z"
+    },
+    "after": {
+      "recordUrl": "https://customer-ruby-8946.lightning.force.com/lightning/r/Account/001ao00002Ej57MAAR/view",
+      "companyName": "",
+      "website": "",
+      "billingAddress": "",
+      "phoneNumber": "",
+      "employeeCount": "",
+      "primaryContactName": "",
+      "primaryContactTitle": "",
+      "primaryContactEmail": "",
+      "capturedAt": "2026-05-09T23:05:26.201Z"
+    },
+    "evidence": [],
+    "changes": [
+      {
+        "field": "companyName",
+        "label": "Company Name",
+        "salesforceLabels": [
+          "Account Name",
+          "Name"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "The CRM snapshot did not provide a trustworthy seed for public-web research.",
+        "status": "skipped",
+        "statusNote": "Salesforce did not expose a reliable company name or website, so browser research was intentionally skipped.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "website",
+        "label": "Website",
+        "salesforceLabels": [
+          "Website"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "The CRM snapshot did not provide a trustworthy seed for public-web research.",
+        "status": "skipped",
+        "statusNote": "Salesforce did not expose a reliable company name or website, so browser research was intentionally skipped.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "billingAddress",
+        "label": "Billing Address",
+        "salesforceLabels": [
+          "Billing Address",
+          "Headquarters"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "The CRM snapshot did not provide a trustworthy seed for public-web research.",
+        "status": "skipped",
+        "statusNote": "Salesforce did not expose a reliable company name or website, so browser research was intentionally skipped.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "phoneNumber",
+        "label": "Phone Number",
+        "salesforceLabels": [
+          "Phone"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "The CRM snapshot did not provide a trustworthy seed for public-web research.",
+        "status": "skipped",
+        "statusNote": "Salesforce did not expose a reliable company name or website, so browser research was intentionally skipped.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "employeeCount",
+        "label": "Employee Count",
+        "salesforceLabels": [
+          "Employees",
+          "Employee Count"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "The CRM snapshot did not provide a trustworthy seed for public-web research.",
+        "status": "skipped",
+        "statusNote": "Salesforce did not expose a reliable company name or website, so browser research was intentionally skipped.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactName",
+        "label": "Primary Contact",
+        "salesforceLabels": [
+          "Primary Contact Name",
+          "Primary Contact"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "The CRM snapshot did not provide a trustworthy seed for public-web research.",
+        "status": "skipped",
+        "statusNote": "Salesforce did not expose a reliable company name or website, so browser research was intentionally skipped.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactTitle",
+        "label": "Primary Contact Title",
+        "salesforceLabels": [
+          "Primary Contact Title",
+          "Primary Contact Title"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "The CRM snapshot did not provide a trustworthy seed for public-web research.",
+        "status": "skipped",
+        "statusNote": "Salesforce did not expose a reliable company name or website, so browser research was intentionally skipped.",
+        "sources": [],
+        "finalValue": ""
+      },
+      {
+        "field": "primaryContactEmail",
+        "label": "Primary Contact Email",
+        "salesforceLabels": [
+          "Primary Contact Email",
+          "Primary Contact Email"
+        ],
+        "oldValue": "",
+        "proposedValue": "",
+        "confidence": 0,
+        "reasoning": "The CRM snapshot did not provide a trustworthy seed for public-web research.",
+        "status": "skipped",
+        "statusNote": "Salesforce did not expose a reliable company name or website, so browser research was intentionally skipped.",
+        "sources": [],
+        "finalValue": ""
+      }
+    ],
+    "session": {
+      "provider": "kernel-cdp",
+      "sessionId": "jvskwoq79yt24j3wd6j0bs1i",
+      "liveUrl": "https://proxy.iad-vigorous-swartz.onkernel.com:8443/browser/live/zlCHwMRmgTCU"
+    }
+  },
+  {
+    "id": "cleanup_54d19a4e-1ae1-4239-a31c-437f726ae8cd",
+    "status": "failed",
+    "mode": "salesforce-browser-live",
+    "summary": "locator.evaluateAll: Execution context was destroyed, most likely because of a navigation",
+    "createdAt": "2026-05-09T22:59:26.997Z",
+    "completedAt": "2026-05-09T22:59:26.997Z",
+    "salesforceRecordUrl": "https://customer-ruby-8946.lightning.force.com/lightning/r/Account/001ao00002Ej57MAAR/view",
+    "steps": [
+      {
+        "key": "opening-browser",
+        "label": "Opening browser session",
+        "status": "completed",
+        "note": "Launching a Kernel-backed browser session for Salesforce and public-web research.",
+        "timestamp": "2026-05-09T22:58:27.279Z"
+      },
+      {
+        "key": "signing-into-salesforce",
+        "label": "Signing into Salesforce",
+        "status": "completed",
+        "note": "Waiting for the Salesforce email verification code from the operator.",
+        "timestamp": "2026-05-09T22:59:02.335Z"
+      },
+      {
+        "key": "reading-salesforce-record",
+        "label": "Reading Salesforce record",
+        "status": "completed",
+        "note": "Loading the configured Account record and capturing current field values.",
+        "timestamp": "2026-05-09T22:59:23.710Z"
+      },
+      {
+        "key": "researching-public-web",
+        "label": "Researching public web",
+        "status": "error",
+        "note": "locator.evaluateAll: Execution context was destroyed, most likely because of a navigation",
+        "timestamp": "2026-05-09T22:59:26.996Z"
+      },
+      {
+        "key": "comparing-evidence",
+        "label": "Comparing evidence",
+        "status": "pending"
+      },
+      {
+        "key": "updating-salesforce",
+        "label": "Updating Salesforce",
+        "status": "pending"
+      },
+      {
+        "key": "verifying-record",
+        "label": "Verifying record",
+        "status": "pending"
+      },
+      {
+        "key": "writing-report",
+        "label": "Writing report",
+        "status": "completed",
+        "timestamp": "2026-05-09T22:59:26.996Z"
+      }
+    ],
+    "before": {
+      "recordUrl": "https://customer-ruby-8946.lightning.force.com/lightning/r/Account/001ao00002Ej57MAAR/view",
+      "companyName": "Crayola",
+      "website": "https://www.crayola.com/",
+      "billingAddress": "",
+      "phoneNumber": "",
+      "employeeCount": "2,003",
+      "primaryContactName": "",
+      "primaryContactTitle": "",
+      "primaryContactEmail": "",
+      "capturedAt": "2026-05-09T22:59:23.710Z"
+    },
+    "after": null,
+    "evidence": [],
+    "changes": [],
+    "session": {
+      "provider": "kernel-cdp",
+      "sessionId": "ujrlxxt5rvdnjhzdioso902t",
+      "liveUrl": "https://proxy.iad-delightful-dickinson.onkernel.com:8443/browser/live/GB1TmFwS5e20"
+    },
+    "errorMessage": "locator.evaluateAll: Execution context was destroyed, most likely because of a navigation"
+  },
+  {
     "id": "cleanup_9bf71556-11df-4423-8c29-8705217310d2",
     "status": "failed",
     "mode": "salesforce-browser-live",

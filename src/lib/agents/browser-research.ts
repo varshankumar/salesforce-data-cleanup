@@ -162,6 +162,26 @@ function companyNameMatches(companyNeedle: string, candidate: string) {
   );
 }
 
+async function safeEvaluateAll<T, A>(
+  page: Page,
+  locator: ReturnType<Page["locator"]>,
+  mapper: (nodes: Array<HTMLElement | SVGElement>, arg: unknown) => T,
+  arg: A,
+): Promise<T> {
+  try {
+    return await locator.evaluateAll(mapper, arg);
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error || "");
+    if (!message.includes("Execution context was destroyed")) {
+      throw error;
+    }
+
+    await page.waitForLoadState("domcontentloaded");
+    await page.waitForTimeout(500);
+    return locator.evaluateAll(mapper, arg);
+  }
+}
+
 async function searchDuckDuckGo(page: Page, query: string): Promise<SearchHit[]> {
   const url = `https://duckduckgo.com/html/?q=${encodeURIComponent(query)}`;
   try {
@@ -171,7 +191,9 @@ async function searchDuckDuckGo(page: Page, query: string): Promise<SearchHit[]>
     return [];
   }
 
-  return page.locator(".result").evaluateAll(
+  return safeEvaluateAll(
+    page,
+    page.locator(".result"),
     (nodes, currentQuery) =>
       nodes
         .slice(0, 6)
@@ -180,7 +202,7 @@ async function searchDuckDuckGo(page: Page, query: string): Promise<SearchHit[]>
           const snippet = node.querySelector(".result__snippet");
 
           return {
-            query: currentQuery,
+            query: String(currentQuery || ""),
             title: link?.textContent?.trim() || "",
             url: link?.href || "",
             snippet: snippet?.textContent?.trim() || "",
@@ -200,7 +222,9 @@ async function searchBing(page: Page, query: string): Promise<SearchHit[]> {
     return [];
   }
 
-  return page.locator("li.b_algo").evaluateAll(
+  return safeEvaluateAll(
+    page,
+    page.locator("li.b_algo"),
     (nodes, currentQuery) =>
       nodes
         .slice(0, 6)
@@ -209,7 +233,7 @@ async function searchBing(page: Page, query: string): Promise<SearchHit[]> {
           const snippet = node.querySelector(".b_caption p");
 
           return {
-            query: currentQuery,
+            query: String(currentQuery || ""),
             title: link?.textContent?.trim() || "",
             url: link?.href || "",
             snippet: snippet?.textContent?.trim() || "",
@@ -229,7 +253,9 @@ async function searchBrave(page: Page, query: string): Promise<SearchHit[]> {
     return [];
   }
 
-  return page.locator(".snippet").evaluateAll(
+  return safeEvaluateAll(
+    page,
+    page.locator(".snippet"),
     (nodes, currentQuery) =>
       nodes
         .slice(0, 6)
@@ -239,7 +265,7 @@ async function searchBrave(page: Page, query: string): Promise<SearchHit[]> {
           const description = node.querySelector(".description");
 
           return {
-            query: currentQuery,
+            query: String(currentQuery || ""),
             title: title?.textContent?.trim() || link?.textContent?.trim() || "",
             url: link?.href || "",
             snippet: description?.textContent?.trim() || "",

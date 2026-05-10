@@ -111,6 +111,61 @@ async function waitForSettledPage(page: Page) {
   await page.waitForTimeout(1200);
 }
 
+async function dismissSalesforcePopup(page: Page) {
+  const selectors = [
+    "button[title='Close']",
+    "button[aria-label='Close']",
+    "button[title='Dismiss']",
+    "button[aria-label='Dismiss']",
+    ".slds-modal__close",
+    ".slds-modal__close button",
+    ".guidedTourSelector button",
+  ];
+
+  const textButtons = [
+    /skip/i,
+    /got it/i,
+    /close/i,
+    /dismiss/i,
+    /finish/i,
+    /next/i,
+  ];
+
+  for (const selector of selectors) {
+    const locator = page.locator(selector).first();
+    if ((await locator.count()) === 0) {
+      continue;
+    }
+
+    try {
+      await locator.click({ timeout: 1200 });
+      await page.waitForTimeout(300);
+    } catch {
+      // Ignore and try the remaining popup affordances.
+    }
+  }
+
+  for (const pattern of textButtons) {
+    const locator = page.getByRole("button", { name: pattern }).first();
+    if ((await locator.count()) === 0) {
+      continue;
+    }
+
+    try {
+      await locator.click({ timeout: 1200 });
+      await page.waitForTimeout(300);
+    } catch {
+      // Ignore and keep trying other close actions.
+    }
+  }
+
+  try {
+    await page.keyboard.press("Escape");
+  } catch {
+    // Ignore escape failures.
+  }
+}
+
 async function findFieldValue(
   page: Page,
   labels: string[],
@@ -346,6 +401,7 @@ export async function loginToSalesforce(
   }
 
   await waitForSettledPage(page);
+  await dismissSalesforcePopup(page);
 
   const emailCodeInput = await findEmailCodeInput(page);
   if (emailCodeInput) {
@@ -384,6 +440,7 @@ export async function loginToSalesforce(
     }
 
     await waitForSettledPage(page);
+    await dismissSalesforcePopup(page);
   }
 
   if (page.url().includes("login.salesforce.com") && (await usernameInput.count()) > 0) {
@@ -404,6 +461,7 @@ export async function openSalesforceAccount(page: Page) {
   const accountUrl = getConfiguredSalesforceAccountUrl();
   await page.goto(accountUrl, { waitUntil: "domcontentloaded" });
   await waitForSettledPage(page);
+  await dismissSalesforcePopup(page);
   return page.url();
 }
 
@@ -509,6 +567,7 @@ export async function scrapeSalesforceAccount(
   try {
     await page.goto(deriveEditUrl(recordUrl), { waitUntil: "domcontentloaded" });
     await waitForSettledPage(page);
+    await dismissSalesforcePopup(page);
     editSnapshot = await scrapeSalesforceAccountFromEditForm(page);
   } catch {
     // Keep the view-page snapshot if the edit form cannot be opened or parsed.
@@ -561,6 +620,7 @@ export async function applyChangesToSalesforceBrowser(
   const editUrl = deriveEditUrl(recordUrl);
   await page.goto(editUrl, { waitUntil: "domcontentloaded" });
   await waitForSettledPage(page);
+  await dismissSalesforcePopup(page);
 
   const results = [...changes];
 
